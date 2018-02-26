@@ -1,0 +1,7 @@
+DB_NAME=myapp
+DB_USER=myapp
+DB_PASS=myapp
+DB_SERVICE=postgres
+DB_PORT=5432
+REDIS_URL=redis://redis:6379/0
+ELASTICSEARCH_URL=http://elasticsearch:9200
