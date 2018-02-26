@@ -1,0 +1,7 @@
+elasticsearch
+flask
+flask_migrate
+flask-redis
+flask_sqlalchemy
+gunicorn
+psycopg2-binary

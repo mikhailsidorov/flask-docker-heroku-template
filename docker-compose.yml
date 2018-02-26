@@ -1,0 +1,57 @@
+version: '2.2'
+services:
+  app:
+    restart: always
+    build: ./app/
+    expose:
+      - "8000"
+    links:
+      - postgres:postgres
+      - redis:redis
+    env_file: docker_env
+    volumes:
+      - ./app:/data/app
+    command: /usr/bin/gunicorn myapp:app -w 2 -b :8000
+  nginx:
+    restart: always
+    build: ./nginx/
+    ports:
+      - "80:80"
+    volumes_from:
+      - app
+    links:
+      - app:app
+  postgres:
+    restart: always
+    image: postgres:latest
+    volumes:
+      - ./postgres/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+      - ./backups/postgresql:/backup
+      - postgresql:/var/lib/postgresql
+    env_file: docker_env
+    expose:
+      - "5432"
+  redis:
+    restart: always
+    image: redis:latest
+    expose:
+      - "6379"
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.2.1
+    environment:
+      - cluster.name=myapp
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - elasticsearch:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+volumes:
+  elasticsearch:
+    driver: local
+  postgresql:
+    driver: local
